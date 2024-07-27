@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "icpcc_airdrop"
+]
+resolver = "2"
