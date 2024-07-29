@@ -1,11 +1,19 @@
 use candid::{Nat, Principal};
-use ic_exports::{ic_cdk::call, ic_kit::CallResult};
+use ic_exports::{ic_cdk::{api::is_controller, call}, ic_kit::CallResult};
 use icrc_ledger_types::icrc1::{account::Account, transfer::{TransferArg, TransferError}};
 
 use crate::{state::get_token_pid, types::AirdropError};
 
+/// Returns error if `caller` is not a controller of the canister
+pub fn only_controller(caller: Principal) -> Result<(), AirdropError> {
+    if !is_controller(&caller) {
+        return Err(AirdropError::Unauthorized);
+    }
+    Ok(())
+}
+
 /// Transfers `amount` tokens to `receiver_pid`
-pub async fn transfer_token(receiver_pid: Principal, amount: Nat) -> Result<(), AirdropError> {
+pub async fn transfer_tokens(receiver_pid: Principal, amount: Nat) -> Result<(), AirdropError> {
     let token_canister = get_token_pid();
     not_anonymous(&token_canister)?;
 
