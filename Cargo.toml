@@ -1,5 +1,5 @@
 [workspace]
 members = [
-    "icpcc_airdrop"
+    "generic_airdrop"
 ]
 resolver = "2"

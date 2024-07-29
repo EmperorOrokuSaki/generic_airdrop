@@ -1,9 +1,15 @@
 {
   "canisters": {
-    "icpcc_airdrop_backend": {
-      "candid": "src/icpcc_airdrop_backend/icpcc_airdrop_backend.did",
-      "package": "icpcc_airdrop_backend",
-      "type": "rust"
+    "airdrop_canister": {
+      "build": "sh build.sh",
+      "candid": "generic_airdrop/candid.did",
+      "wasm": "target/wasm32-unknown-unknown/release/generic_airdrop.wasm",
+      "type": "custom",
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
     }
   },
   "defaults": {
