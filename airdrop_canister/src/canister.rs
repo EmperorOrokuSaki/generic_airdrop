@@ -76,6 +76,11 @@ impl Airdrop {
         get_user_reward(user)
     }
 
+    #[query]
+    pub fn get_user_list(&self, start_index: u64) -> Vec<(Principal, Nat)> {
+        get_all_allocations().split_off(start_index as usize)
+    }
+
     pub fn idl() -> Idl {
         generate_idl!()
     }

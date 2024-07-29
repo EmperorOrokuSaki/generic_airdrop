@@ -2,8 +2,8 @@
   "canisters": {
     "airdrop_canister": {
       "build": "sh build.sh",
-      "candid": "generic_airdrop/candid.did",
-      "wasm": "target/wasm32-unknown-unknown/release/generic_airdrop.wasm",
+      "candid": "airdrop_canister/candid.did",
+      "wasm": "target/wasm32-unknown-unknown/release/airdrop_canister.wasm",
       "type": "custom",
       "metadata": [
         {

@@ -67,11 +67,11 @@ The canister exposes the following query methods:
     ```sh
     dfx canister call --ic airdrop_canister get_user_allocation '(principal "USER_PRINCIPAL_ID")'
     ```
-- Get the list of users and their respective token shares:
+- Get the list of users and their respective token shares (paginated):
     ```sh
-    dfx canister call --ic airdrop_canister get_user_list
+    dfx canister call --ic airdrop_canister get_user_list '(STARTING_INDEX)'
     ```
 
 ## Acknowledgments
 
-This canister was developed to simplify the process of conducting token airdrops to multiple users efficiently and accurately. It can be used by any organization or individual needing to perform airdrops based on a predefined dataset.
+This canister was developed for the ICP CC DAO to simplify the process of conducting token airdrops to multiple users efficiently and accurately. It can be used by any organization or individual needing to perform airdrops based on a predefined dataset.

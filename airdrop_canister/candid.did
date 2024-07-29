@@ -1,0 +1,14 @@
+type AirdropError = variant {
+  Unauthorized;
+  TokenCanisterError : text;
+  Unknown : text;
+  ConfigurationError;
+};
+type Result = variant { Ok; Err : AirdropError };
+service : {
+  add_allocations : (vec record { principal; nat }) -> (Result);
+  distribute : (nat) -> (Result);
+  get_user_allocation : (principal) -> (opt nat) query;
+  get_user_list : (nat64) -> (vec record { principal; nat }) query;
+  set_token_canister_id : (principal) -> (Result);
+}
