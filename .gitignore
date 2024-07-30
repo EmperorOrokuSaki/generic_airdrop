@@ -9,6 +9,7 @@
 
 # dfx temporary files
 .dfx/
+canister_ids.json
 
 # generated files
 **/declarations/
@@ -26,3 +27,4 @@ dist/
 .env
 gitm.toml
 *.csv
+allocations.json

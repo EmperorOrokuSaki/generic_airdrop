@@ -44,6 +44,11 @@ impl Airdrop {
         only_controller(caller())?;
 
         let allocations = get_all_allocations();
+
+        if allocations.len() < 1 {
+            return Err(AirdropError::EmptyAllocationList)
+        }
+
         let mut shares_sum: Nat = Nat::from(0 as u32);
         allocations
             .iter()
@@ -78,8 +83,16 @@ impl Airdrop {
 
     #[query]
     pub fn get_user_list(&self, start_index: u64) -> Vec<(Principal, Nat)> {
-        get_all_allocations().split_off(start_index as usize)
-    }
+        let allocations = get_all_allocations();
+        let start_index = start_index as usize;
+        let end_index = usize::min(start_index + 100, allocations.len());
+        
+        if start_index >= allocations.len() {
+            return vec![];
+        }
+    
+        allocations[start_index..end_index].to_vec()
+    }    
 
     pub fn idl() -> Idl {
         generate_idl!()
