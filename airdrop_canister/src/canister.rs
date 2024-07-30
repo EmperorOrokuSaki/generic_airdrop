@@ -1,5 +1,5 @@
 use crate::{
-    state::{add_share_allocation, add_token_allocation, get_all_share_allocations, get_all_token_allocations, get_user_shares, get_user_tokens, SHARE_ALLOCATIONS, TOKEN_PID},
+    state::{add_share_allocation, add_token_allocation, clear_all, get_all_share_allocations, get_all_token_allocations, get_user_shares, get_user_tokens, SHARE_ALLOCATIONS, TOKEN_PID},
     types::AirdropError,
     utils::{only_controller, token_balance, token_fee, transfer_tokens},
 };
@@ -43,7 +43,7 @@ impl Airdrop {
     pub fn reset(&self,) -> Result<(), AirdropError> {
         only_controller(caller())?;
 
-        
+        clear_all();
 
         Ok(())
     }

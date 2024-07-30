@@ -13,5 +13,6 @@ service : {
   get_tokens_list : (nat64) -> (vec record { principal; nat }) query;
   get_user_share_allocation : (principal) -> (opt nat) query;
   get_user_token_allocation : (principal) -> (opt nat) query;
+  reset : () -> (Result);
   set_token_canister_id : (principal) -> (Result);
 }

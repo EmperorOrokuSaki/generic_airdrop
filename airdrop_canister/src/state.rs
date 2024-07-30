@@ -11,6 +11,13 @@ thread_local! {
     pub static SHARE_ALLOCATIONS: RefCell<HashMap<Principal, Nat>> = RefCell::new(HashMap::new());
 }
 
+/// Clears the token canister pid, token allocations and share allocations
+pub fn clear_all() {
+    TOKEN_PID.with(|pid| *pid.borrow_mut() = Principal::anonymous());
+    TOKEN_ALLOCATIONS.with(|allocations| allocations.borrow_mut().clear());
+    SHARE_ALLOCATIONS.with(|allocations| allocations.borrow_mut().clear());
+}
+
 /// Returns the token's principal ID
 pub fn get_token_pid() -> Principal {
     TOKEN_PID.with(|pid| pid.borrow().clone())

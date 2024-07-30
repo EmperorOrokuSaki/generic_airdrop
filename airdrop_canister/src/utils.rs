@@ -1,5 +1,5 @@
 use candid::{Nat, Principal};
-use ic_exports::{ic_cdk::{api::is_controller, call, id}, ic_kit::CallResult};
+use ic_exports::{ic_cdk::{api::is_controller, call}, ic_kit::CallResult};
 use icrc_ledger_types::icrc1::{account::Account, transfer::{TransferArg, TransferError}};
 
 use crate::{state::get_token_pid, types::AirdropError};
