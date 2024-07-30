@@ -6,7 +6,9 @@ thread_local! {
     /// Token canister's principal ID
     pub static TOKEN_PID: RefCell<Principal> = RefCell::new(Principal::anonymous());
     /// HashMap of all participants and their receiving amount
-    pub static ALLOCATIONS: RefCell<HashMap<Principal, Nat>> = RefCell::new(HashMap::new());
+    pub static TOKEN_ALLOCATIONS: RefCell<HashMap<Principal, Nat>> = RefCell::new(HashMap::new());
+    /// HashMap of all participants and their shares
+    pub static SHARE_ALLOCATIONS: RefCell<HashMap<Principal, Nat>> = RefCell::new(HashMap::new());
 }
 
 /// Returns the token's principal ID
@@ -14,17 +16,32 @@ pub fn get_token_pid() -> Principal {
     TOKEN_PID.with(|pid| pid.borrow().clone())
 }
 
+/// Returns the amount of shares allocated to `user`
+pub fn get_user_shares(user: Principal) -> Option<Nat> {
+    SHARE_ALLOCATIONS.with(|allocations| allocations.borrow().get(&user).cloned())
+}
+
+/// Returns the vector of all users and their share allocations
+pub fn get_all_share_allocations() -> Vec<(Principal, Nat)> {
+    SHARE_ALLOCATIONS.with(|allocations| allocations.borrow().clone().into_iter().collect())
+}
+
+/// Add a share allocation
+pub fn add_share_allocation(user: Principal, amount: Nat) {
+    SHARE_ALLOCATIONS.with(|allocations| allocations.borrow_mut().insert(user, amount));
+}
+
 /// Returns the amount of tokens allocated to `user`
-pub fn get_user_reward(user: Principal) -> Option<Nat> {
-    ALLOCATIONS.with(|allocations| allocations.borrow().get(&user).cloned())
+pub fn get_user_tokens(user: Principal) -> Option<Nat> {
+    TOKEN_ALLOCATIONS.with(|allocations| allocations.borrow().get(&user).cloned())
 }
 
-/// Returns the vector of all users and their allocations
-pub fn get_all_allocations() -> Vec<(Principal, Nat)> {
-    ALLOCATIONS.with(|allocations| allocations.borrow().clone().into_iter().collect())
+/// Returns the vector of all users and their token allocations
+pub fn get_all_token_allocations() -> Vec<(Principal, Nat)> {
+    TOKEN_ALLOCATIONS.with(|allocations| allocations.borrow().clone().into_iter().collect())
 }
 
-/// Add an allocation
-pub fn add_allocation(user: Principal, amount: Nat) {
-    ALLOCATIONS.with(|allocations| allocations.borrow_mut().insert(user, amount));
+/// Add a token allocation
+pub fn add_token_allocation(user: Principal, amount: Nat) {
+    TOKEN_ALLOCATIONS.with(|allocations| allocations.borrow_mut().insert(user, amount));
 }

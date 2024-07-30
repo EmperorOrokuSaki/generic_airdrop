@@ -17,7 +17,7 @@ current_entry=0
 # Function to make the dfx canister call with the constructed vector
 make_call() {
     local vector_data="$1"
-    command="dfx canister call --ic airdrop_canister add_allocations '(vec {${vector_data}})'"
+    command="dfx canister call --ic airdrop_canister add_share_allocations '(vec {${vector_data}})'"
     echo "Running: $command"
     echo "$command"
     eval "$command"

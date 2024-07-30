@@ -1,5 +1,5 @@
 use candid::{Nat, Principal};
-use ic_exports::{ic_cdk::{api::is_controller, call}, ic_kit::CallResult};
+use ic_exports::{ic_cdk::{api::is_controller, call, id}, ic_kit::CallResult};
 use icrc_ledger_types::icrc1::{account::Account, transfer::{TransferArg, TransferError}};
 
 use crate::{state::get_token_pid, types::AirdropError};
@@ -40,6 +40,35 @@ pub async fn transfer_tokens(receiver_pid: Principal, amount: Nat) -> Result<(),
     }?;
 
     Ok(())
+}
+
+/// Returns the token's transfer fee
+pub async fn token_fee() -> Result<Nat, AirdropError> {
+    let token_canister = get_token_pid();
+    not_anonymous(&token_canister)?;
+
+    let call_response = call(token_canister, "icrc1_fee", ()).await;
+
+    let fee = handle_intercanister_call::<Nat>(call_response)?;
+
+    Ok(fee)
+}
+
+/// Returns `user`'s token balance
+pub async fn token_balance(user: Principal) -> Result<Nat, AirdropError> {
+    let token_canister = get_token_pid();
+    not_anonymous(&token_canister)?;
+
+    let account = Account {
+        owner: user,
+        subaccount: None,
+    };
+
+    let call_response = call(token_canister, "icrc1_balance_of", (account,)).await;
+
+    let fee = handle_intercanister_call::<Nat>(call_response)?;
+
+    Ok(fee)
 }
 
 pub fn not_anonymous(id: &Principal) -> Result<(), AirdropError> {
