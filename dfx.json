@@ -10,6 +10,11 @@
           "name": "candid:service"
         }
       ]
+    },
+    "icrc1-ledger": {
+      "type": "custom",
+      "wasm": "ledger/ic-icrc1-ledger.wasm",
+      "candid": "ledger/ledger.did"
     }
   },
   "defaults": {
