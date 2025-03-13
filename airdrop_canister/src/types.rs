@@ -7,5 +7,5 @@ pub enum AirdropError {
     TokenCanisterError(String),
     Unauthorized,
     EmptyAllocationList,
-    ConfigurationError
+    ConfigurationError,
 }

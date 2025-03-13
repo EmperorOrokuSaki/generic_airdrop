@@ -1,7 +1,7 @@
 mod canister;
 mod state;
-mod utils;
 mod types;
+mod utils;
 
 use crate::canister::Airdrop;
 

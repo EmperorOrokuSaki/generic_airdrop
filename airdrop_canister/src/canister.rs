@@ -1,5 +1,9 @@
 use crate::{
-    state::{add_share_allocation, add_token_allocation, clear_all, get_all_share_allocations, get_all_token_allocations, get_token_pid, get_user_shares, get_user_tokens, INTERRUPTED_DISTRIBUTIONS, SHARE_ALLOCATIONS, TOKEN_PID},
+    state::{
+        add_share_allocation, add_token_allocation, clear_all, get_all_share_allocations,
+        get_all_token_allocations, get_token_pid, get_user_shares, get_user_tokens,
+        INTERRUPTED_DISTRIBUTIONS, SHARE_ALLOCATIONS, TOKEN_PID,
+    },
     types::AirdropError,
     utils::{only_controller, token_balance, token_fee, transfer_tokens},
 };
@@ -40,7 +44,10 @@ impl Airdrop {
     }
 
     #[update]
-    pub fn add_share_allocations(&self, allocations: Vec<(Principal, Nat)>) -> Result<(), AirdropError> {
+    pub fn add_share_allocations(
+        &self,
+        allocations: Vec<(Principal, Nat)>,
+    ) -> Result<(), AirdropError> {
         only_controller(caller())?;
 
         allocations.iter().for_each(|allocation| {
@@ -51,12 +58,15 @@ impl Airdrop {
     }
 
     #[update]
-    pub fn validate_add_share_allocations(&self, allocations: Vec<(Principal, Nat)>) -> Result<(), AirdropError> {
+    pub fn validate_add_share_allocations(
+        &self,
+        allocations: Vec<(Principal, Nat)>,
+    ) -> Result<(), AirdropError> {
         only_controller(caller())?;
 
         for (user, share) in allocations.iter() {
             if *share == Nat::from(0_u8) || *user == Principal::anonymous() {
-                return Err(AirdropError::ConfigurationError)
+                return Err(AirdropError::ConfigurationError);
             }
         }
 
@@ -64,7 +74,7 @@ impl Airdrop {
     }
 
     #[update]
-    pub fn reset(&self,) -> Result<(), AirdropError> {
+    pub fn reset(&self) -> Result<(), AirdropError> {
         only_controller(caller())?;
 
         clear_all();
@@ -73,7 +83,7 @@ impl Airdrop {
     }
 
     #[update]
-    pub fn validate_reset(&self,) -> Result<(), AirdropError> {
+    pub fn validate_reset(&self) -> Result<(), AirdropError> {
         only_controller(caller())?;
         Ok(())
     }
@@ -100,7 +110,9 @@ impl Airdrop {
         let total_fee = share_allocations.len() * fee;
 
         if total_fee > total_tokens {
-            return Err(AirdropError::Unknown("Not enough token balance to cover the transfer fees.".to_string()))   
+            return Err(AirdropError::Unknown(
+                "Not enough token balance to cover the transfer fees.".to_string(),
+            ));
         }
 
         let token_per_share = (total_tokens - total_fee) / shares_sum;
@@ -153,7 +165,9 @@ impl Airdrop {
         let total_fee = share_allocations.len() * fee;
 
         if total_fee > total_tokens {
-            return Err(AirdropError::Unknown("Not enough token balance to cover the transfer fees.".to_string()))   
+            return Err(AirdropError::Unknown(
+                "Not enough token balance to cover the transfer fees.".to_string(),
+            ));
         }
 
         let token_per_share = (total_tokens - total_fee) / shares_sum;
@@ -198,10 +212,10 @@ impl Airdrop {
     }
 
     #[query]
-    pub fn get_interrupted_distributions(&self,) -> Vec<(Principal, Nat)> {
-        INTERRUPTED_DISTRIBUTIONS.with(|allocations| allocations.borrow().clone().into_iter().collect())
+    pub fn get_interrupted_distributions(&self) -> Vec<(Principal, Nat)> {
+        INTERRUPTED_DISTRIBUTIONS
+            .with(|allocations| allocations.borrow().clone().into_iter().collect())
     }
-
 
     #[query]
     pub fn get_tokens_list(&self, start_index: u64) -> Vec<(Principal, Nat)> {

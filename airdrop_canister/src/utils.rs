@@ -1,6 +1,12 @@
 use candid::{Nat, Principal};
-use ic_exports::{ic_cdk::{api::is_controller, call}, ic_kit::CallResult};
-use icrc_ledger_types::icrc1::{account::Account, transfer::{TransferArg, TransferError}};
+use ic_exports::{
+    ic_cdk::{api::is_controller, call},
+    ic_kit::CallResult,
+};
+use icrc_ledger_types::icrc1::{
+    account::Account,
+    transfer::{TransferArg, TransferError},
+};
 
 use crate::{state::get_token_pid, types::AirdropError};
 
@@ -29,7 +35,7 @@ pub async fn transfer_tokens(receiver_pid: Principal, amount: Nat) -> Result<(),
         amount,
     };
 
-    let call_response = call(token_canister, "icrc1_transfer", (transfer_args, )).await;
+    let call_response = call(token_canister, "icrc1_transfer", (transfer_args,)).await;
 
     match handle_intercanister_call::<Result<Nat, TransferError>>(call_response)? {
         Err(err) => Err(AirdropError::TokenCanisterError(format!(
