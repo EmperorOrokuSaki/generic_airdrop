@@ -7,6 +7,8 @@ thread_local! {
     pub static TOKEN_PID: RefCell<Principal> = RefCell::new(Principal::anonymous());
     /// HashMap of all participants and their receiving amount
     pub static TOKEN_ALLOCATIONS: RefCell<HashMap<Principal, Nat>> = RefCell::new(HashMap::new());
+    /// HashMap of all allocations that were interrupted by unexpected errors during distribution
+    pub static INTERRUPTED_DISTRIBUTIONS: RefCell<HashMap<Principal, Nat>> = RefCell::new(HashMap::new());
     /// HashMap of all participants and their shares
     pub static SHARE_ALLOCATIONS: RefCell<HashMap<Principal, Nat>> = RefCell::new(HashMap::new());
 }

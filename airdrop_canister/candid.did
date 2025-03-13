@@ -9,10 +9,16 @@ type Result = variant { Ok; Err : AirdropError };
 service : {
   add_share_allocations : (vec record { principal; nat }) -> (Result);
   distribute : () -> (Result);
+  get_interrupted_distributions : () -> (vec record { principal; nat }) query;
   get_shares_list : (nat64) -> (vec record { principal; nat }) query;
+  get_token_canister_id : () -> (opt principal) query;
   get_tokens_list : (nat64) -> (vec record { principal; nat }) query;
   get_user_share_allocation : (principal) -> (opt nat) query;
   get_user_token_allocation : (principal) -> (opt nat) query;
   reset : () -> (Result);
   set_token_canister_id : (principal) -> (Result);
+  validate_add_share_allocations : (vec record { principal; nat }) -> (Result);
+  validate_distribute : () -> (Result);
+  validate_reset : () -> (Result);
+  validate_set_token_canister_id : (principal) -> (Result);
 }

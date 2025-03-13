@@ -1,5 +1,5 @@
 use crate::{
-    state::{add_share_allocation, add_token_allocation, clear_all, get_all_share_allocations, get_all_token_allocations, get_user_shares, get_user_tokens, SHARE_ALLOCATIONS, TOKEN_PID},
+    state::{add_share_allocation, add_token_allocation, clear_all, get_all_share_allocations, get_all_token_allocations, get_token_pid, get_user_shares, get_user_tokens, INTERRUPTED_DISTRIBUTIONS, SHARE_ALLOCATIONS, TOKEN_PID},
     types::AirdropError,
     utils::{only_controller, token_balance, token_fee, transfer_tokens},
 };
@@ -29,6 +29,17 @@ impl Airdrop {
     }
 
     #[update]
+    pub fn validate_set_token_canister_id(&self, id: Principal) -> Result<(), AirdropError> {
+        only_controller(caller())?;
+
+        if id == Principal::anonymous() {
+            return Err(AirdropError::ConfigurationError);
+        }
+
+        Ok(())
+    }
+
+    #[update]
     pub fn add_share_allocations(&self, allocations: Vec<(Principal, Nat)>) -> Result<(), AirdropError> {
         only_controller(caller())?;
 
@@ -40,11 +51,30 @@ impl Airdrop {
     }
 
     #[update]
+    pub fn validate_add_share_allocations(&self, allocations: Vec<(Principal, Nat)>) -> Result<(), AirdropError> {
+        only_controller(caller())?;
+
+        for (user, share) in allocations.iter() {
+            if *share == Nat::from(0_u8) || *user == Principal::anonymous() {
+                return Err(AirdropError::ConfigurationError)
+            }
+        }
+
+        Ok(())
+    }
+
+    #[update]
     pub fn reset(&self,) -> Result<(), AirdropError> {
         only_controller(caller())?;
 
         clear_all();
 
+        Ok(())
+    }
+
+    #[update]
+    pub fn validate_reset(&self,) -> Result<(), AirdropError> {
+        only_controller(caller())?;
         Ok(())
     }
 
@@ -60,7 +90,7 @@ impl Airdrop {
             return Err(AirdropError::EmptyAllocationList);
         }
 
-        let mut shares_sum: Nat = Nat::from(0 as u32);
+        let mut shares_sum: Nat = Nat::from(0_u32);
 
         share_allocations
             .iter()
@@ -68,7 +98,16 @@ impl Airdrop {
 
         let fee = token_fee().await?;
         let total_fee = share_allocations.len() * fee;
+
+        if total_fee > total_tokens {
+            return Err(AirdropError::Unknown("Not enough token balance to cover the transfer fees.".to_string()))   
+        }
+
         let token_per_share = (total_tokens - total_fee) / shares_sum;
+
+        if token_per_share == Nat::from(0_u8) {
+            return Err(AirdropError::Unknown("Token per share is zero".to_string()));
+        }
 
         for (user, share) in share_allocations {
             let tokens = token_per_share.clone() * share;
@@ -81,7 +120,8 @@ impl Airdrop {
                     add_token_allocation(user, tokens);
                     break;
                 } else if tries > 2 {
-                    return transfer_result;
+                    INTERRUPTED_DISTRIBUTIONS.with(|list| list.borrow_mut().insert(user, tokens));
+                    break;
                 }
 
                 tries += 1;
@@ -89,6 +129,49 @@ impl Airdrop {
         }
 
         Ok(())
+    }
+
+    #[update]
+    pub async fn validate_distribute(&self) -> Result<(), AirdropError> {
+        only_controller(caller())?;
+
+        let total_tokens = token_balance(id()).await?;
+
+        let share_allocations = get_all_share_allocations();
+
+        if share_allocations.len() == 0 {
+            return Err(AirdropError::EmptyAllocationList);
+        }
+
+        let mut shares_sum: Nat = Nat::from(0_u32);
+
+        share_allocations
+            .iter()
+            .for_each(|(_, share)| shares_sum += share.clone());
+
+        let fee = token_fee().await?;
+        let total_fee = share_allocations.len() * fee;
+
+        if total_fee > total_tokens {
+            return Err(AirdropError::Unknown("Not enough token balance to cover the transfer fees.".to_string()))   
+        }
+
+        let token_per_share = (total_tokens - total_fee) / shares_sum;
+
+        if token_per_share == Nat::from(0_u8) {
+            return Err(AirdropError::Unknown("Token per share is zero".to_string()));
+        }
+
+        Ok(())
+    }
+
+    #[query]
+    pub fn get_token_canister_id(&self) -> Option<Principal> {
+        let id = get_token_pid();
+        if id == Principal::anonymous() {
+            return None;
+        }
+        Some(id)
     }
 
     #[query]
@@ -113,6 +196,12 @@ impl Airdrop {
 
         allocations[start_index..end_index].to_vec()
     }
+
+    #[query]
+    pub fn get_interrupted_distributions(&self,) -> Vec<(Principal, Nat)> {
+        INTERRUPTED_DISTRIBUTIONS.with(|allocations| allocations.borrow().clone().into_iter().collect())
+    }
+
 
     #[query]
     pub fn get_tokens_list(&self, start_index: u64) -> Vec<(Principal, Nat)> {

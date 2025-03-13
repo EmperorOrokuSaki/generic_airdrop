@@ -16,8 +16,8 @@ CANISTER_NAME="airdrop_canister"
 TOKEN_CANISTER_NAME="icrc1-ledger"
 ALLOCATION_FILE="allocations.csv"
 IC_VERSION="ledger-suite-icrc-2025-02-27"
-TRANSFER_AMOUNT="4_000_000_000_000"  # Amount to mint for testing
-AIRDROP_TOTAL="3_370_000_000_000"  # Amount to transfer to airdrop canister
+TRANSFER_AMOUNT="4_000_001_000_000"  # Amount to mint for testing
+AIRDROP_TOTAL="4_000_000_000_000"  # Amount to transfer to airdrop canister
 CYCLES="100_000_000_000_000"  # Amount of cycles to deposit
 TMP_DIR=""
 
